@@ -1,5 +1,5 @@
 import LeftSidebar from '@/components/layout/left-sidebar'
-import Navbar from '@/components/layout/navbar'
+import { Navbar } from '@/components/layout/navbar'
 
 export default async function CoreGroupLayout({ children }: { children: React.ReactNode }) {
   return (
