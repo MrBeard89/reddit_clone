@@ -1,4 +1,4 @@
-import { formatCount } from '@/lib/format'
+import { formatCount } from '@/lib/format/format'
 import { Tag } from '@/lib/types'
 import Link from 'next/link'
 
