@@ -239,17 +239,17 @@ async function batchUserVotesForComments(
   return m
 }
 
-// function mapPostRow(row: PostModel, tagSlugs: string[], commentCount: number): Post {
-//   return {
-//     id: row.id,
-//     authorId: row.authorId,
-//     title: row.title,
-//     body: row.body,
-//     tagSlugs,
-//     createdAt: row.createdAt.toISOString(),
-//     commentCount,
-//   }
-// }
+function mapPostRow(row: PostModel, tagSlugs: string[], commentCount: number): Post {
+  return {
+    id: row.id,
+    authorId: row.authorId,
+    title: row.title,
+    body: row.body,
+    tagSlugs,
+    createdAt: row.createdAt.toISOString(),
+    commentCount,
+  }
+}
 
 export async function getUserVote(
   userId: string | undefined,
@@ -273,46 +273,46 @@ export async function getUserVote(
   return v === -1 || v === 1 ? v : 0
 }
 
-// export async function getCommentTree(
-//   postId: string,
-//   sessionUserId?: string,
-// ): Promise<EnrichedCommentNode[]> {
-//   const flat = await listCommentsForPost(postId)
-//   if (flat.length === 0) return []
-//   const authorIds = [...new Set(flat.map((c) => c.authorId))]
-//   const authorMap = await batchAuthorsForIds(authorIds)
+export async function getCommentTree(
+  postId: string,
+  sessionUserId?: string,
+): Promise<EnrichedCommentNode[]> {
+  const flat = await listCommentsForPost(postId)
+  if (flat.length === 0) return []
+  const authorIds = [...new Set(flat.map((c) => c.authorId))]
+  const authorMap = await batchAuthorsForIds(authorIds)
 
-//   const commentIds = flat.map((c) => c.id)
-//   const scoreMap = await batchCommentScores(commentIds)
-//   const voteMap = sessionUserId
-//     ? await batchUserVotesForComments(sessionUserId, commentIds)
-//     : new Map<string, -1 | 0 | 1>()
+  const commentIds = flat.map((c) => c.id)
+  const scoreMap = await batchCommentScores(commentIds)
+  const voteMap = sessionUserId
+    ? await batchUserVotesForComments(sessionUserId, commentIds)
+    : new Map<string, -1 | 0 | 1>()
 
-//   const enriched = flat
-//     .map((c) => {
-//       const author = authorMap.get(c.authorId)
-//       if (!author) return null
+  const enriched = flat
+    .map((c) => {
+      const author = authorMap.get(c.authorId)
+      if (!author) return null
 
-//       return {
-//         ...c,
-//         author,
-//         score: scoreMap.get(c.id) ?? 0,
-//         userVote: (voteMap.get(c.id) ?? 0) as -1 | 0 | 1,
-//       }
-//     })
-//     .filter((x): x is NonNullable<typeof x> => x !== null)
+      return {
+        ...c,
+        author,
+        score: scoreMap.get(c.id) ?? 0,
+        userVote: (voteMap.get(c.id) ?? 0) as -1 | 0 | 1,
+      }
+    })
+    .filter((x): x is NonNullable<typeof x> => x !== null)
 
-//   return nestCommentRows(enriched)
-// }
+  return nestCommentRows(enriched)
+}
 
-// export async function listCommentsForPost(postId: string): Promise<Comment[]> {
-//   const rows = await prisma.comment.findMany({ where: { postId } })
-//   return rows.map((c) => ({
-//     id: c.id,
-//     postId: c.postId,
-//     authorId: c.authorId,
-//     parentId: c.parentId,
-//     body: c.body,
-//     createdAt: c.createdAt.toISOString(),
-//   }))
-// }
+export async function listCommentsForPost(postId: string): Promise<Comment[]> {
+  const rows = await prisma.comment.findMany({ where: { postId } })
+  return rows.map((c) => ({
+    id: c.id,
+    postId: c.postId,
+    authorId: c.authorId,
+    parentId: c.parentId,
+    body: c.body,
+    createdAt: c.createdAt.toISOString(),
+  }))
+}
